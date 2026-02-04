@@ -1,0 +1,250 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  active    Boolean  @default(true)
+  suspended Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  postLikes    PostLike[]
+  commentLikes CommentLike[]
+
+  categories Category[] @relation("UserCategories")
+
+  profile Profile?
+
+  posts    Post[]
+  comments Comment[]
+
+  settings Settings?
+
+  subscribers Subscription[] @relation("UserSubscribers")
+  subscribing Subscription[] @relation("UserSubscribing")
+
+  blockedUsers Block[] @relation("UserBlocks")
+  blockedBy    Block[] @relation("UserBlockedBy")
+}
+
+model Profile {
+  id             String  @id @default(uuid())
+  displayName    String
+  avatarUrl      String?
+  avatarPath     String?
+  coverImageUrl  String?
+  coverImagePath String?
+  bio            String?
+  nationality    String?
+  socials        Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id             String    @id @default(uuid())
+  title          String
+  content        Json
+  slug           String    @unique
+  summary        String?
+  tags           String[]
+  coverImageUrl  String?
+  coverImagePath String?
+  views          Int       @default(0)
+  readTime       Int       @default(0)
+  isFeatured     Boolean   @default(false)
+  published      Boolean   @default(false)
+  publishedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  likes    PostLike[]
+  comments Comment[]
+
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  userId String
+  author User   @relation(fields: [userId], references: [id])
+
+  isDeleted Boolean  @default(false)
+}
+
+model PostLike {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  isEdited  Boolean  @default(false)
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  postId String
+
+  user  User          @relation(fields: [userId], references: [id])
+  post  Post          @relation(fields: [postId], references: [id])
+  likes CommentLike[]
+}
+
+model CommentLike {
+  id        String   @id @default(uuid())
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  comment Comment @relation(fields: [commentId], references: [id])
+
+  @@unique([userId, commentId])
+}
+
+model Category {
+  id          String  @id @default(uuid())
+  name        String
+  slug        String  @unique
+  description String?
+  colorLight  String
+  colorDark   String
+
+  users User[] @relation("UserCategories")
+  posts Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Settings {
+  id            String          @id @default(uuid())
+  theme         ThemePreference @default(SYSTEM)
+  fontSize      FontSize        @default(MEDIUM)
+  lineHeight    LineHeight      @default(NORMAL)
+  notifications Boolean         @default(true)
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Subscription {
+  id String @id @default(uuid())
+
+  subscriberId String
+  subscribedId String
+
+  subscriber User @relation("UserSubscribing", fields: [subscriberId], references: [id], onDelete: Cascade)
+  subscribed User @relation("UserSubscribers", fields: [subscribedId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([subscriberId, subscribedId])
+}
+
+model Block {
+  id String @id @default(uuid())
+
+  blockerId String
+  blockedId String
+
+  blocker User @relation("UserBlocks", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("UserBlockedBy", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+}
+
+enum ThemePreference {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+enum FontSize {
+  SMALL
+  MEDIUM
+  LARGE
+}
+
+enum LineHeight {
+  NORMAL
+  WIDE
+}
+
+model Admin {
+  id           String  @id @default(uuid())
+  adminId      String  @unique
+  email        String  @unique
+  username     String  @unique
+  password     String
+  name         String
+  avatarUrl    String
+  avatarPath   String
+  number       String
+  isDeleted    Boolean @default(false)
+  isSuperAdmin Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  logs         Log[]
+}
+
+
+model Log {
+  id          String    @id @default(uuid())
+  actorId     String
+  actor       Admin     @relation(fields: [actorId], references: [id])
+  action      LogAction
+  meta        Json
+  description String
+  createdAt   DateTime  @default(now())
+}
+
+
+enum LogAction {
+  UPDATE_PROFILE   // Admin updates their own profile
+
+  SUSPEND_USER     // Admin suspends a user
+  ACTIVATE_USER    // Admin restores a suspended user
+  RESTORE_USER     // Admin restores a deleted user
+
+  DELETE_POST      // Admin marks a post as deleted
+  RESTORE_POST     // Admin restores a deleted post
+
+  CREATE_CATEGORY // Admin suspends a category
+  DELETE_CATEGORY  // Admin marks a category as deleted
+
+  OTHER            // Any other custom action
+}

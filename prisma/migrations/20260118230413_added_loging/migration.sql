@@ -1,0 +1,24 @@
+-- CreateEnum
+CREATE TYPE "LogAction" AS ENUM ('UPDATE_PROFILE', 'SUSPEND_USER', 'ACTIVATE_USER', 'RESTORE_USER', 'DELETE_POST', 'RESTORE_POST', 'CREATE_CATEGORY', 'DELETE_CATEGORY', 'OTHER');
+
+-- AlterTable
+ALTER TABLE "Admin" ADD COLUMN     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "isSuperAdmin" BOOLEAN NOT NULL DEFAULT false;
+
+-- AlterTable
+ALTER TABLE "Post" ADD COLUMN     "isDeleted" BOOLEAN NOT NULL DEFAULT false;
+
+-- CreateTable
+CREATE TABLE "Log" (
+    "id" TEXT NOT NULL,
+    "actorId" TEXT NOT NULL,
+    "action" "LogAction" NOT NULL,
+    "meta" JSONB NOT NULL,
+    "description" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Log_pkey" PRIMARY KEY ("id")
+);
+
+-- AddForeignKey
+ALTER TABLE "Log" ADD CONSTRAINT "Log_actorId_fkey" FOREIGN KEY ("actorId") REFERENCES "Admin"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
