@@ -8,6 +8,13 @@ class CategoryService {
       orderBy: {
         name: "asc",
       },
+      select: {
+        id: true,
+        name: true,
+        colorDark: true,
+        colorLight: true,
+        description: true,
+      },
     });
 
     return categories;

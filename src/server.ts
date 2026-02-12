@@ -9,7 +9,8 @@ import userRouter from "./routes/userRouters.js";
 import adminRouter from "./routes/adminRoutes.js";
 import categoryRouter from "./routes/categoryRoutes.js";
 import logRouter from "./routes/logRoutes.js";
-import { slugGenerator } from "./utils/slugGenerater.js";
+import postRouter from "./routes/postRoutes.js";
+import generateTagsRouter from "./routes/generateTags.js";
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.use(
   }),
 );
 
-app.use(express.json({ limit: "3mb" }));
+app.use(express.json({ limit: "4mb" }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 
@@ -35,6 +36,7 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/category", categoryRouter);
 app.use("/api/v1/logs", logRouter);
+app.use("/api/v1/posts", postRouter);
 
 // 404 Handler: Catches all routes that don't exist
 app.use((req: Request, res: Response, next) => {
