@@ -53,5 +53,5 @@ router.put(
   authUserMiddleware,
   userController.userUpdateSettings,
 );
-
+router.post("/logout", userController.logout);
 export default router;

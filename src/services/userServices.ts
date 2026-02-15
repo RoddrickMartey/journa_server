@@ -225,8 +225,6 @@ class UserService {
     userId: string,
     socials: { media: string; link: string }[],
   ) {
-    console.log(socials);
-
     const updatedProfile = await prisma.profile.update({
       where: { userId },
       data: { socials },
@@ -274,6 +272,88 @@ class UserService {
       select: { theme: true, fontSize: true, lineHeight: true },
     });
     return updatedUser;
+  }
+  /**
+   * Fetch another user's public profile.
+   * @param currentUserId - ID of the requesting user (optional, for block/subscription checks)
+   * @param targetUsername - username of the user whose profile is requested
+   */
+  async getPublicProfile(currentUserId: string | null, targetUserId: string) {
+    // Find the user by username
+    const user = await prisma.user.findUnique({
+      where: { id: targetUserId },
+      select: {
+        id: true,
+        createdAt: true,
+        profile: {
+          select: {
+            displayName: true,
+            avatarUrl: true,
+            coverImageUrl: true,
+            bio: true,
+            nationality: true,
+            socials: true,
+          },
+        },
+        posts: {
+          where: { published: true, isDeleted: false },
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            coverImageUrl: true,
+            summary: true,
+            createdAt: true,
+          },
+          take: 5, // latest 5 posts
+          orderBy: { createdAt: "desc" },
+        },
+        subscribers: {
+          select: { subscriberId: true },
+        },
+        subscribing: {
+          select: { subscribedId: true },
+        },
+        blockedUsers: {
+          select: { blockedId: true },
+        },
+        blockedBy: {
+          select: { blockerId: true },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    // Check if current user is blocked or has blocked the target user
+    const isBlocked =
+      (currentUserId &&
+        (user.blockedUsers.some((b) => b.blockedId === currentUserId) ||
+          user.blockedBy.some((b) => b.blockerId === currentUserId))) ??
+      false;
+
+    if (isBlocked) {
+      throw new AppError("You cannot view this profile", 403);
+    }
+
+    // Compute counts
+    const postCount = user.posts.length;
+    const subscriberCount = user.subscribers.length;
+    const subscribingCount = user.subscribing.length;
+
+    return {
+      id: user.id,
+      createdAt: user.createdAt,
+      profile: user.profile,
+      stats: {
+        posts: postCount,
+        subscribers: subscriberCount,
+        subscribing: subscribingCount,
+      },
+      latestPosts: user.posts,
+    };
   }
 }
 

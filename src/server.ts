@@ -10,20 +10,27 @@ import adminRouter from "./routes/adminRoutes.js";
 import categoryRouter from "./routes/categoryRoutes.js";
 import logRouter from "./routes/logRoutes.js";
 import postRouter from "./routes/postRoutes.js";
-import generateTagsRouter from "./routes/generateTags.js";
+import commentRouter from "./routes/commentRoutes.js";
+import blockRouter from "./routes/blockRoutes.js";
+import postLikeRouter from "./routes/postLikeRoutes.js";
+import subscriptionRouter from "./routes/subscriptionRoutes.js";
+import feedRouter from "./routes/feedRoutes.js";
+
+const BASEPATH = "/api/v1";
 
 const app = express();
 
 // Core middleware
+
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
   }),
 );
-
-app.use(express.json({ limit: "4mb" }));
 app.use(cookieParser());
+app.use(express.json({ limit: "4mb" }));
+
 app.use(morgan("dev"));
 
 // Health check
@@ -32,11 +39,16 @@ app.get("/health", (req: Request, res: Response) => {
 });
 
 // Routes
-app.use("/api/v1/user", userRouter);
-app.use("/api/v1/admin", adminRouter);
-app.use("/api/v1/category", categoryRouter);
-app.use("/api/v1/logs", logRouter);
-app.use("/api/v1/posts", postRouter);
+app.use(`${BASEPATH}/user`, userRouter);
+app.use(`${BASEPATH}/admin`, adminRouter);
+app.use(`${BASEPATH}/category`, categoryRouter);
+app.use(`${BASEPATH}/logs`, logRouter);
+app.use(`${BASEPATH}/posts`, postRouter);
+app.use(`${BASEPATH}/comments`, commentRouter);
+app.use(`${BASEPATH}/blocks`, blockRouter);
+app.use(`${BASEPATH}/post-likes`, postLikeRouter);
+app.use(`${BASEPATH}/subscriptions`, subscriptionRouter);
+app.use(`${BASEPATH}/feed`, feedRouter);
 
 // 404 Handler: Catches all routes that don't exist
 app.use((req: Request, res: Response, next) => {

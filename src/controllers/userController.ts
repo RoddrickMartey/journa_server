@@ -20,6 +20,7 @@ import { countries } from "../data/countries";
 import { AppError } from "../errors/appError";
 
 class UserController {
+  readonly secured = process.env.NODE_ENV === "production";
   /**
    * Log in a user
    */
@@ -28,11 +29,14 @@ class UserController {
 
     const result = await userService.login(payload);
 
+    const expires = new Date(Date.now() + 4 * 24 * 60 * 60 * 1000);
+
     res.cookie("token", result.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 4 * 24 * 60 * 60 * 1000, // 4 days
+      secure: this.secured,
+      sameSite: "lax",
+      expires,
+      path: "/",
     });
 
     return res.status(200).json({ user: result.user });
@@ -153,6 +157,20 @@ class UserController {
     const settings = updateSettingsSchema.parse(req.body);
     const updatedSettings = await userService.changeSettings(userId, settings);
     return res.status(200).json(updatedSettings);
+  });
+
+  logout = asyncHandler(async (req: Request, res: Response) => {
+    // Clear cookie storing JWT
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
   });
 }
 

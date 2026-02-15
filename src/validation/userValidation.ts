@@ -108,6 +108,16 @@ export const updateSettingsSchema = z.object({
   lineHeight: z.enum(LineHeight),
 });
 
+export const socialsSchema = z
+  .array(
+    z.object({
+      media: z.string().min(1, "Social media name is required"),
+      link: z.url("Invalid URL"),
+    }),
+  )
+  .optional(); // optional for empty updates
+
+export type SocialsType = z.infer<typeof socialsSchema>;
 export type UpdateSettingsType = z.infer<typeof updateSettingsSchema>;
 
 export type UserSignupType = z.infer<typeof userSignupSchema>;
