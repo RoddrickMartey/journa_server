@@ -5,6 +5,7 @@ import {
   authLimiter,
   createUpdateLimiter,
 } from "../middlewares/rateLimiter.js";
+import { restrictGuest } from "../middlewares/restrictGuest.js";
 
 const router = Router();
 
@@ -17,12 +18,14 @@ router.put(
   "/update/email",
   authUserMiddleware,
   createUpdateLimiter,
+  restrictGuest,
   userController.userUpdateEmail,
 );
 router.put(
   "/update/username",
   authUserMiddleware,
   createUpdateLimiter,
+  restrictGuest,
   userController.userUpdateUsername,
 );
 
@@ -30,6 +33,7 @@ router.put(
   "/update/avatar",
   authUserMiddleware,
   createUpdateLimiter,
+  restrictGuest,
   userController.userUpdateAvatar,
 );
 
@@ -37,6 +41,7 @@ router.put(
   "/update/cover",
   authUserMiddleware,
   createUpdateLimiter,
+  restrictGuest,
   userController.userUpdateCover,
 );
 
@@ -44,6 +49,7 @@ router.put(
   "/update/bio",
   authUserMiddleware,
   createUpdateLimiter,
+  restrictGuest,
   userController.userUpdateBio,
 );
 
@@ -51,6 +57,7 @@ router.put(
   "/update/nationality",
   authUserMiddleware,
   createUpdateLimiter,
+  restrictGuest,
   userController.userUpdateNationality,
 );
 
@@ -58,6 +65,7 @@ router.put(
   "/update/displayname",
   authUserMiddleware,
   createUpdateLimiter,
+  restrictGuest,
   userController.userUpdateDisplayName,
 );
 
@@ -65,6 +73,7 @@ router.put(
   "/update/socials",
   authUserMiddleware,
   createUpdateLimiter,
+  restrictGuest,
   userController.userUpdateSocials,
 );
 
@@ -72,6 +81,7 @@ router.put(
   "/change-password",
   authUserMiddleware,
   createUpdateLimiter,
+  restrictGuest,
   userController.userUpdatePassword,
 );
 
@@ -79,6 +89,7 @@ router.put(
   "/update/settings",
   authUserMiddleware,
   createUpdateLimiter,
+  restrictGuest,
   userController.userUpdateSettings,
 );
 

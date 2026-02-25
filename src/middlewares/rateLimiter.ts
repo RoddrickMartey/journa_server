@@ -1,11 +1,32 @@
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
+import { RateLimitRequestHandler } from "express-rate-limit";
+import { AppError } from "../errors/appError"; // Adjust path as needed
+import { NextFunction, Request, Response } from "express";
 
 const userOrIpKeyGenerator = (req: any) => {
   if (req.auth?.id) {
     return `user-${req.auth.id}`;
   }
+  return `ip-${ipKeyGenerator(req)}`;
+};
 
-  return `ip-${ipKeyGenerator(req)}`; // IPv4 + IPv6 safe
+interface RateLimitHandlerOptions {
+  message?: string;
+  statusCode?: number;
+}
+
+export const limitReachedHandler = (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+  options: RateLimitHandlerOptions
+) => {
+  const message =
+    options?.message ?? "Too many requests. Please try again later.";
+
+  const statusCode = options?.statusCode ?? 429;
+
+  next(new AppError(message, statusCode));
 };
 
 /**
@@ -24,6 +45,7 @@ export const authLimiter = rateLimit({
   message: "Too many login/signup attempts, please try again later.",
   statusCode: 429,
   skip: (req) => req.path === "/health",
+  handler: limitReachedHandler,
 });
 
 // ============================================
@@ -39,6 +61,7 @@ export const createUpdateLimiter = rateLimit({
   statusCode: 429,
   keyGenerator: userOrIpKeyGenerator,
   skip: (req) => req.path === "/health",
+  handler: limitReachedHandler,
 });
 
 export const postCreationLimiter = rateLimit({
@@ -49,6 +72,7 @@ export const postCreationLimiter = rateLimit({
   message: "You've reached the post creation limit. Try again later.",
   statusCode: 429,
   keyGenerator: userOrIpKeyGenerator,
+  handler: limitReachedHandler,
 });
 
 export const commentCreationLimiter = rateLimit({
@@ -59,6 +83,7 @@ export const commentCreationLimiter = rateLimit({
   message: "Too many comments. Please slow down.",
   statusCode: 429,
   keyGenerator: userOrIpKeyGenerator,
+  handler: limitReachedHandler,
 });
 
 export const likeSubscribeLimiter = rateLimit({
@@ -69,6 +94,7 @@ export const likeSubscribeLimiter = rateLimit({
   message: "Too many like/subscription operations. Please try again later.",
   statusCode: 429,
   keyGenerator: userOrIpKeyGenerator,
+  handler: limitReachedHandler,
 });
 
 // ============================================
@@ -83,6 +109,7 @@ export const readLimiter = rateLimit({
   message: "Too many read requests. Please try again later.",
   statusCode: 429,
   skip: (req) => req.path === "/health",
+  handler: limitReachedHandler,
 });
 
 export const feedLimiter = rateLimit({
@@ -92,6 +119,7 @@ export const feedLimiter = rateLimit({
   legacyHeaders: false,
   message: "Too many feed requests. Please try again later.",
   statusCode: 429,
+  handler: limitReachedHandler,
 });
 
 // ============================================
@@ -105,6 +133,7 @@ export const adminAuthLimiter = rateLimit({
   legacyHeaders: false,
   message: "Too many admin login attempts. Your account may be locked.",
   statusCode: 429,
+  handler: limitReachedHandler,
 });
 
 export const adminWriteLimiter = rateLimit({
@@ -115,6 +144,7 @@ export const adminWriteLimiter = rateLimit({
   message: "Too many admin operations. Please try again later.",
   statusCode: 429,
   keyGenerator: userOrIpKeyGenerator,
+  handler: limitReachedHandler,
 });
 
 export const reportLimiter = rateLimit({
@@ -125,6 +155,7 @@ export const reportLimiter = rateLimit({
   message: "You've reached your daily report limit.",
   statusCode: 429,
   keyGenerator: userOrIpKeyGenerator,
+  handler: limitReachedHandler,
 });
 
 // ============================================
@@ -139,6 +170,7 @@ export const uploadLimiter = rateLimit({
   message: "Too many uploads. Please try again later.",
   statusCode: 429,
   keyGenerator: userOrIpKeyGenerator,
+  handler: limitReachedHandler,
 });
 
 export const globalLimiter = rateLimit({
@@ -149,6 +181,7 @@ export const globalLimiter = rateLimit({
   message: "Too many requests from this IP, please try again later.",
   statusCode: 429,
   skip: (req) => req.path === "/health",
+  handler: limitReachedHandler,
 });
 
 export const blockLimiter = rateLimit({
@@ -159,6 +192,7 @@ export const blockLimiter = rateLimit({
   message: "Too many block operations. Please try again later.",
   statusCode: 429,
   keyGenerator: userOrIpKeyGenerator,
+  handler: limitReachedHandler,
 });
 
 export const categoryLimiter = rateLimit({
@@ -169,6 +203,7 @@ export const categoryLimiter = rateLimit({
   message: "Too many category operations. Please try again later.",
   statusCode: 429,
   keyGenerator: userOrIpKeyGenerator,
+  handler: limitReachedHandler,
 });
 
 export const suspensionLimiter = rateLimit({
@@ -179,4 +214,5 @@ export const suspensionLimiter = rateLimit({
   message: "Suspension limit reached. Please try again later.",
   statusCode: 429,
   keyGenerator: userOrIpKeyGenerator,
+  handler: limitReachedHandler,
 });
