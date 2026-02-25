@@ -4,6 +4,9 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 
+// Import Prisma to keep the DB awake
+import { prisma } from "./db/client"; // Adjust path as needed
+
 import { globalErrorHandler } from "./middlewares/glodalErrorHandler.js";
 import { globalLimiter } from "./middlewares/rateLimiter.js";
 import userRouter from "./routes/userRouters.js";
@@ -21,14 +24,18 @@ import subscriptionRouter from "./routes/subscriptionRoutes.js";
 import feedRouter from "./routes/feedRoutes.js";
 
 const BASEPATH = "/api/v1";
-
 const app = express();
 
-// Core middleware
+// ============================================
+// SECURITY & PROXY CONFIG
+// ============================================
+// Required for express-rate-limit to see the real IP behind free-tier proxies
+app.set("trust proxy", 1);
 
-// Apply global rate limiter to all routes
+// ============================================
+// CORE MIDDLEWARE
+// ============================================
 app.use(globalLimiter);
-
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
@@ -37,15 +44,30 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json({ limit: "4mb" }));
-
 app.use(morgan("dev"));
 
-// Health check
-app.get("/health", (req: Request, res: Response) => {
-  res.json({ status: "ok", message: "Journa API is running" });
+// ============================================
+// AUTOMATION: HEALTH & KEEP-ALIVE
+// ============================================
+app.get("/health", async (req: Request, res: Response) => {
+  try {
+    // 1. Keep DB awake: Executes a tiny query to prevent pause
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({
+      status: "ok",
+      message: "Journa API is running",
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res
+      .status(503)
+      .json({ status: "error", message: "Database is waking up..." });
+  }
 });
 
-// Routes
+// ============================================
+// ROUTES
+// ============================================
 app.use(`${BASEPATH}/user`, userRouter);
 app.use(`${BASEPATH}/admin`, adminRouter);
 app.use(`${BASEPATH}/category`, categoryRouter);
@@ -60,8 +82,8 @@ app.use(`${BASEPATH}/post-likes`, postLikeRouter);
 app.use(`${BASEPATH}/subscriptions`, subscriptionRouter);
 app.use(`${BASEPATH}/feed`, feedRouter);
 
-// 404 Handler: Catches all routes that don't exist
-app.use((req: Request, res: Response, next) => {
+// 404 Handler
+app.use((req: Request, res: Response) => {
   res.status(404).json({
     status: "fail",
     message: `Route ${req.originalUrl} not found`,
@@ -71,8 +93,27 @@ app.use((req: Request, res: Response, next) => {
 // Global error handler (must be last)
 app.use(globalErrorHandler);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+
+  // 2. Self-Ping Automation: Pings itself every 26 minutes in production
+  if (process.env.NODE_ENV === "production") {
+    const SELF_URL = `${process.env.BACKEND_URL}/health`;
+
+    setInterval(
+      async () => {
+        try {
+          const response = await fetch(SELF_URL);
+          console.log(
+            `[Keep-Alive] Pinged ${SELF_URL}. Status: ${response.status}`,
+          );
+        } catch (err: any) {
+          console.error(`[Keep-Alive] Failed to ping: ${err.message}`);
+        }
+      },
+      26 * 60 * 1000,
+    ); // 26 Minutes
+  }
 });
