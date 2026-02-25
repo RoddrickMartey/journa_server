@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import "dotenv/config";
 
 // Import Prisma to keep the DB awake
-import { prisma } from "./db/client"; // Adjust path as needed
+import { prisma } from "./db/client.js";
 
 import { globalErrorHandler } from "./middlewares/glodalErrorHandler.js";
 import { globalLimiter } from "./middlewares/rateLimiter.js";
