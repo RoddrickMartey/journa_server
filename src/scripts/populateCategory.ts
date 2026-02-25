@@ -72,6 +72,41 @@ const categories = [
     colorLight: "#263238", // Charcoal
     colorDark: "#ECEFF1", // Slate Mist
   },
+  {
+    name: "Finance",
+    description:
+      "Insights on personal finance, investing, saving strategies, and understanding money.",
+    colorLight: "#0D47A1", // Strong Blue
+    colorDark: "#E3F2FD", // Light Sky Blue
+  },
+  {
+    name: "Food",
+    description:
+      "Recipes, culinary experiences, food culture, nutrition tips, and dining discoveries.",
+    colorLight: "#BF360C", // Deep Coral
+    colorDark: "#FBE9E7", // Soft Apricot
+  },
+  {
+    name: "History",
+    description:
+      "Stories from the past, historical analysis, cultural heritage, and lessons from history.",
+    colorLight: "#5D4037", // Earth Brown
+    colorDark: "#EFEBE9", // Sandstone Tint
+  },
+  {
+    name: "Sports",
+    description:
+      "Coverage of sports events, fitness activities, athlete stories, and game analysis.",
+    colorLight: "#1A237E", // Indigo Blue
+    colorDark: "#E8EAF6", // Pale Indigo
+  },
+  {
+    name: "Spirituality",
+    description:
+      "Reflections on faith, mindfulness, purpose, philosophy, and personal inner growth.",
+    colorLight: "#6A1B9A", // Royal Purple
+    colorDark: "#F3E5F5", // Light Lilac
+  },
 ];
 
 async function populateCategories() {

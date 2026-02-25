@@ -4,11 +4,15 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 
-import { globalErrorHandler } from "./middlewares/gladalErrorHandler.js";
+import { globalErrorHandler } from "./middlewares/glodalErrorHandler.js";
+import { globalLimiter } from "./middlewares/rateLimiter.js";
 import userRouter from "./routes/userRouters.js";
 import adminRouter from "./routes/adminRoutes.js";
 import categoryRouter from "./routes/categoryRoutes.js";
 import logRouter from "./routes/logRoutes.js";
+import reportRouter from "./routes/reportRoutes.js";
+import adminFetchRouter from "./routes/adminFetchRoutes.js";
+import adminSuspensionRouter from "./routes/adminSuspensionRoutes.js";
 import postRouter from "./routes/postRoutes.js";
 import commentRouter from "./routes/commentRoutes.js";
 import blockRouter from "./routes/blockRoutes.js";
@@ -21,6 +25,9 @@ const BASEPATH = "/api/v1";
 const app = express();
 
 // Core middleware
+
+// Apply global rate limiter to all routes
+app.use(globalLimiter);
 
 app.use(
   cors({
@@ -43,6 +50,9 @@ app.use(`${BASEPATH}/user`, userRouter);
 app.use(`${BASEPATH}/admin`, adminRouter);
 app.use(`${BASEPATH}/category`, categoryRouter);
 app.use(`${BASEPATH}/logs`, logRouter);
+app.use(`${BASEPATH}/reports`, reportRouter);
+app.use(`${BASEPATH}/admin-fetch`, adminFetchRouter);
+app.use(`${BASEPATH}/admin-suspension`, adminSuspensionRouter);
 app.use(`${BASEPATH}/posts`, postRouter);
 app.use(`${BASEPATH}/comments`, commentRouter);
 app.use(`${BASEPATH}/blocks`, blockRouter);

@@ -40,6 +40,9 @@ model User {
 
   blockedUsers Block[] @relation("UserBlocks")
   blockedBy    Block[] @relation("UserBlockedBy")
+
+  reportsMade     Report[] @relation("ReportsCreated")
+  reportsReceived Report[] @relation("ReportsTargeted")
 }
 
 model Profile {
@@ -63,7 +66,7 @@ model Profile {
 model Post {
   id             String    @id @default(uuid())
   title          String
-  content        Json?     
+  content        Json?
   slug           String    @unique
   summary        String?
   tags           String[]
@@ -76,6 +79,7 @@ model Post {
   publishedAt    DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  suspended Boolean  @default(false)
 
   likes    PostLike[]
   comments Comment[]
@@ -86,7 +90,9 @@ model Post {
   userId String
   author User   @relation(fields: [userId], references: [id])
 
-  isDeleted Boolean  @default(false)
+  isDeleted Boolean @default(false)
+
+  reports Report[]
 }
 
 model PostLike {
@@ -96,7 +102,8 @@ model PostLike {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
-  post Post @relation(fields: [postId], references: [id])
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
 
   @@unique([userId, postId])
 }
@@ -113,8 +120,10 @@ model Comment {
   postId String
 
   user  User          @relation(fields: [userId], references: [id])
-  post  Post          @relation(fields: [postId], references: [id])
+  post  Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
   likes CommentLike[]
+  
+  reports Report[]
 }
 
 model CommentLike {
@@ -124,7 +133,7 @@ model CommentLike {
   createdAt DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id])
-  comment Comment @relation(fields: [commentId], references: [id])
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade) // Add this!
 
   @@unique([userId, commentId])
 }
@@ -204,23 +213,22 @@ enum LineHeight {
 }
 
 model Admin {
-  id           String  @id @default(uuid())
-  adminId      String  @unique
-  email        String  @unique
-  username     String  @unique
+  id           String   @id @default(uuid())
+  adminId      String   @unique
+  email        String   @unique
+  username     String   @unique
   password     String
   name         String
   avatarUrl    String
   avatarPath   String
   number       String
-  isDeleted    Boolean @default(false)
-  isSuperAdmin Boolean @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isDeleted    Boolean  @default(false)
+  isSuperAdmin Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  logs         Log[]
+  logs Log[]
 }
-
 
 model Log {
   id          String    @id @default(uuid())
@@ -232,19 +240,58 @@ model Log {
   createdAt   DateTime  @default(now())
 }
 
-
 enum LogAction {
-  UPDATE_PROFILE   // Admin updates their own profile
+  UPDATE_PROFILE // Admin updates their own profile
 
-  SUSPEND_USER     // Admin suspends a user
-  ACTIVATE_USER    // Admin restores a suspended user
-  RESTORE_USER     // Admin restores a deleted user
+  SUSPEND_USER // Admin suspends a user
+  ACTIVATE_USER // Admin restores a suspended user
+  RESTORE_USER // Admin restores a deleted user
 
-  DELETE_POST      // Admin marks a post as deleted
-  RESTORE_POST     // Admin restores a deleted post
+  DELETE_POST // Admin marks a post as deleted
+  RESTORE_POST // Admin restores a deleted post
 
   CREATE_CATEGORY // Admin suspends a category
-  DELETE_CATEGORY  // Admin marks a category as deleted
+  DELETE_CATEGORY // Admin marks a category as deleted
 
-  OTHER            // Any other custom action
+  OTHER // Any other custom action
+}
+
+model Report {
+  id String @id @default(uuid())
+
+  reporterId String
+  reporter   User   @relation("ReportsCreated", fields: [reporterId], references: [id])
+
+  reportedUserId String?
+  reportedUser   User?   @relation("ReportsTargeted", fields: [reportedUserId], references: [id])
+
+  // ADD THESE RELATIONS:
+  postId String?
+  post   Post?   @relation(fields: [postId], references: [id])
+
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id])
+
+  reason    ReportReason
+  message   String?
+  status    ReportStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+
+  @@index([reportedUserId])
+  @@index([postId])
+  @@index([commentId])
+}
+
+enum ReportReason {
+  SPAM
+  HARASSMENT
+  ABUSE
+  FALSE_INFORMATION
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
 }

@@ -21,6 +21,7 @@ import { AppError } from "../errors/appError";
 
 class UserController {
   readonly secured = process.env.NODE_ENV === "production";
+
   /**
    * Log in a user
    */
@@ -33,10 +34,10 @@ class UserController {
 
     res.cookie("token", result.token, {
       httpOnly: true,
-      secure: this.secured,
-      sameSite: "lax",
-      expires,
+      secure: this.secured, // HTTPS only in production
+      sameSite: this.secured ? "none" : "lax", // cross-origin in production
       path: "/",
+      expires,
     });
 
     return res.status(200).json({ user: result.user });
@@ -160,17 +161,29 @@ class UserController {
   });
 
   logout = asyncHandler(async (req: Request, res: Response) => {
-    // Clear cookie storing JWT
+    const isProduction = process.env.NODE_ENV === "production";
+    // Clear cookie storing JWT with consistent security settings
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
     });
 
     res.status(200).json({
       success: true,
       message: "Logged out successfully",
     });
+  });
+
+  getUserPublicProfile = asyncHandler(async (req: Request, res: Response) => {
+    // currentUserId might be null if you allow guests to view profiles
+    const currentUserId = req.auth?.id || null;
+    const { username } = req.params as { username: string };
+
+    const user = await userService.getPublicProfile(currentUserId, username);
+
+    res.status(200).json(user);
   });
 }
 

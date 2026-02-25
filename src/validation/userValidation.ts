@@ -13,15 +13,38 @@ export const userLoginSchema = z.object({
     .min(8, "Password must be 8 characters and above"),
 });
 
-/**
- * User signup validation schema
- */
+// List of reserved words based on your Route paths
+const reservedUsernames = [
+  "admin",
+  "auth",
+  "user",
+  "posts",
+  "read",
+  "api",
+  "settings",
+  "profile",
+  "login",
+  "signup",
+  "author",
+  "main",
+  "dashboard",
+];
+
 export const userSignupSchema = z.object({
   username: z
     .string({ error: "Username is required" })
-    .min(8, "Username must be at least 8 characters long"),
+    .min(3, "Username must be at least 3 characters long") // Usually 3-5 is better for UX than 8
+    .max(20, "Username cannot exceed 20 characters")
+    .regex(
+      /^[a-zA-Z0-9._]+$/,
+      "Usernames can only contain letters, numbers, periods, and underscores",
+    )
+    .transform((val) => val.toLowerCase()) // Always store as lowercase
+    .refine((val) => !reservedUsernames.includes(val), {
+      message: "This username is reserved and cannot be used",
+    }),
 
-  email: z.email("Invalid email address"),
+  email: z.string().email("Invalid email address"),
 
   password: z
     .string({ error: "Password is required" })
@@ -31,7 +54,6 @@ export const userSignupSchema = z.object({
     .string({ error: "Display name is required" })
     .min(2, "Display name must be at least 2 characters long"),
 });
-
 export const userUpdateEmailSchema = z.object({
   email: z.email("Invalid email address"),
 });
@@ -39,7 +61,16 @@ export const userUpdateEmailSchema = z.object({
 export const userUpdateUsernameSchema = z.object({
   username: z
     .string({ error: "Username is required" })
-    .min(8, "Username must be at least 8 characters long"),
+    .min(3, "Username must be at least 3 characters long") // Usually 3-5 is better for UX than 8
+    .max(20, "Username cannot exceed 20 characters")
+    .regex(
+      /^[a-zA-Z0-9._]+$/,
+      "Usernames can only contain letters, numbers, periods, and underscores",
+    )
+    .transform((val) => val.toLowerCase()) // Always store as lowercase
+    .refine((val) => !reservedUsernames.includes(val), {
+      message: "This username is reserved and cannot be used",
+    }),
 });
 
 export const userUpdateAvatarSchema = z.object({

@@ -8,6 +8,16 @@ import { CreatePost, EditorContentType } from "../validation/postValidation";
 
 class PostService {
   async createPast(payload: CreatePost, userId: string) {
+    // Check if user is suspended
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { suspended: true },
+    });
+
+    if (user?.suspended) {
+      throw new AppError("Your account has been suspended", 403);
+    }
+
     let image;
     if (payload.coverImageBase64) {
       image = await cloudinaryService.uploadBase64({
@@ -38,6 +48,16 @@ class PostService {
     payload: Partial<CreatePost>,
     userId: string,
   ) {
+    // Check if user is suspended
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { suspended: true },
+    });
+
+    if (user?.suspended) {
+      throw new AppError("Your account has been suspended", 403);
+    }
+
     // 1. Fetch current data for cleanup and security
     const existingPost = await prisma.post.findUnique({
       where: { id: postId },
@@ -90,6 +110,16 @@ class PostService {
   }
 
   async removePostCoverImage(postId: string, userId: string) {
+    // Check if user is suspended
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { suspended: true },
+    });
+
+    if (user?.suspended) {
+      throw new AppError("Your account has been suspended", 403);
+    }
+
     // 1. Fetch to find the image path and verify ownership
     const post = await prisma.post.findUnique({
       where: { id: postId },
@@ -146,15 +176,27 @@ class PostService {
     return post;
   }
 
-  async getPost(slug: string) {
-    const post = await prisma.post.findFirst({
+  async getPost(slug: string, userId: string) {
+    const post = await prisma.post.findUnique({
       where: {
         slug,
         isDeleted: false,
         published: true,
         content: { not: Prisma.JsonNull },
+        suspended: false,
+        author: userId
+          ? {
+              blockedBy: {
+                none: { blockerId: userId },
+              },
+              blockedUsers: {
+                none: { blockedId: userId },
+              },
+            }
+          : undefined,
       },
       select: {
+        id: true,
         title: true,
         content: true,
         summary: true,
@@ -165,6 +207,8 @@ class PostService {
         isFeatured: true,
         views: true,
         readTime: true,
+        isDeleted: true,
+        published: true,
         category: {
           select: {
             id: true,
@@ -177,16 +221,36 @@ class PostService {
         author: {
           select: {
             id: true,
+            username: true,
             profile: {
               select: {
                 avatarUrl: true,
                 displayName: true,
               },
             },
+            subscribers: {
+              where: { subscriberId: userId },
+              select: { id: true },
+            },
           },
         },
         comments: {
-          where: { isDeleted: false },
+          where: {
+            isDeleted: false,
+            user: {
+              suspended: false,
+              blockedUsers: {
+                none: {
+                  blockedId: userId,
+                },
+              },
+              blockedBy: {
+                none: {
+                  blockerId: userId,
+                },
+              },
+            },
+          },
           select: {
             id: true,
             content: true,
@@ -204,10 +268,10 @@ class PostService {
                 },
               },
             },
-            _count: {
-              select: {
-                likes: true,
-              },
+            _count: { select: { likes: true } },
+            likes: {
+              where: { userId },
+              select: { id: true },
             },
           },
         },
@@ -217,12 +281,49 @@ class PostService {
             comments: true,
           },
         },
+        likes: {
+          where: { userId },
+          select: { id: true },
+        },
       },
     });
-    if (!post) {
-      throw new AppError("Post not found", 403);
+
+    if (
+      !post ||
+      post.isDeleted ||
+      !post.published ||
+      post.content === null ||
+      post.content === "null"
+    ) {
+      throw new AppError("Post not found or unavailable", 404);
     }
-    return post;
+
+    const { likes, comments, isDeleted, published, author, ...postData } = post;
+
+    return {
+      ...postData,
+      isLiked: likes.length > 0,
+      author: {
+        ...author,
+        isFollowing: author.subscribers.length > 0,
+      },
+      comments: comments.map(({ likes: cLikes, ...comment }) => ({
+        ...comment,
+        isLiked: cLikes.length > 0,
+      })),
+    };
+  }
+
+  /**
+   * Dedicated method to increase views.
+   * Call this only once when the page component mounts.
+   */
+  async incrementView(slug: string) {
+    return await prisma.post.update({
+      where: { slug },
+      data: { views: { increment: 1 } },
+      select: { id: true },
+    });
   }
   async getPostForAuthorView(slug: string, userId: string) {
     const post = await prisma.post.findFirst({
@@ -352,6 +453,16 @@ class PostService {
     postId: string,
     userId: string,
   ) {
+    // Check if user is suspended
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { suspended: true },
+    });
+
+    if (user?.suspended) {
+      throw new AppError("Your account has been suspended", 403);
+    }
+
     // 1. Verify ownership
     const post = await prisma.post.findFirst({
       where: { id: postId, userId },
@@ -379,9 +490,19 @@ class PostService {
   }
 
   async togglePostPublishment(postId: string, userId: string) {
+    // Check if user is suspended
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { suspended: true },
+    });
+
+    if (user?.suspended) {
+      throw new AppError("Your account has been suspended", 403);
+    }
+
     const post = await prisma.post.findFirst({
       where: { id: postId, userId },
-      select: { published: true, isDeleted: true },
+      select: { published: true, isDeleted: true, publishedAt: true },
     });
 
     if (!post) {
@@ -394,12 +515,28 @@ class PostService {
 
     await prisma.post.update({
       where: { id: postId },
-      data: { published: !post.published },
+      data: {
+        published: !post.published,
+        // only set publishedAt if it's the first time publishing
+        publishedAt:
+          !post.published && !post.publishedAt ? new Date() : post.publishedAt,
+      },
     });
   }
+
   // post.service.ts
 
   async toggleTrashStatus(postId: string, userId: string) {
+    // Check if user is suspended
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { suspended: true },
+    });
+
+    if (user?.suspended) {
+      throw new AppError("Your account has been suspended", 403);
+    }
+
     const post = await prisma.post.findFirst({
       where: { id: postId, userId },
       select: { isDeleted: true },
@@ -423,6 +560,16 @@ class PostService {
   }
 
   async permanentDelete(postId: string, userId: string) {
+    // Check if user is suspended
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { suspended: true },
+    });
+
+    if (user?.suspended) {
+      throw new AppError("Your account has been suspended", 403);
+    }
+
     // 1. Verify existence, ownership, and that it is actually IN the trash
     const post = await prisma.post.findFirst({
       where: { id: postId, userId },

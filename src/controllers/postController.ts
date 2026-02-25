@@ -49,8 +49,15 @@ class PostController {
   });
 
   getPost = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.auth!.id;
     const { slug } = req.params as { slug: string };
-    const result = await postService.getPost(slug);
+    const result = await postService.getPost(slug, userId);
+    return res.status(200).json(result);
+  });
+
+  incrementView = asyncHandler(async (req: Request, res: Response) => {
+    const { slug } = req.params as { slug: string };
+    const result = await postService.incrementView(slug);
     return res.status(200).json(result);
   });
 

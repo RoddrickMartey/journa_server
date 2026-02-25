@@ -22,11 +22,14 @@ class AdminController {
     const payload = adminCreateSchema.parse(req.body);
     const actorId = req.auth?.id; // Get current admin if authenticated
     const result = await authService.createAdmin(payload, actorId);
+    const isProduction = process.env.NODE_ENV === "production";
 
     res.cookie("token", result.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: isProduction,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
     });
 
     return res.status(201).json({
@@ -41,17 +44,23 @@ class AdminController {
   loginAdmin = asyncHandler(async (req: Request, res: Response) => {
     const payload = adminLoginSchema.parse(req.body);
     const result = await authService.loginAdmin(payload);
+    const isProduction = process.env.NODE_ENV === "production";
 
     res.cookie("token", result.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction,
       sameSite: "strict",
-      maxAge: 14 * 60 * 60 * 1000, // 7 days
+      maxAge: 14 * 60 * 60 * 1000,
+      path: "/",
     });
 
     if (result.isSuperAdmin) {
       res.cookie("supaAdmin", result.admin.id, {
-        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? "strict" : "lax",
+        maxAge: 14 * 60 * 60 * 1000,
+        path: "/",
       });
     }
 

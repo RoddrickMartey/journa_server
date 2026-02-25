@@ -7,11 +7,11 @@ class BlockController {
     const blockerId = req.auth!.id;
     const { blockedId } = req.params as { blockedId: string };
 
-    await blockService.toggleBlock(blockerId, blockedId);
+    const result = await blockService.toggleBlock(blockerId, blockedId);
 
     res.status(200).json({
       success: true,
-      message: "Block status updated",
+      blocked: result.blocked,
     });
   });
 }

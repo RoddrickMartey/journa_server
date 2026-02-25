@@ -28,9 +28,13 @@ class CommentController {
 
   deleteComment = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.auth!.id;
+    console.log("456");
     const { commentId } = req.params as { commentId: string };
+    console.log(commentId);
+
     await commentService.deleteComment(userId, commentId);
-    res.status(201).json({ success: true });
+
+    return res.status(201).json({ success: true });
   });
 }
 
