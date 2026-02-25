@@ -1,6 +1,6 @@
-import { prisma } from "../db/client";
-import { CategoryInput } from "../validation/categoryValidation";
-import { slugGenerator } from "../utils/slugGenerater";
+import { prisma } from "../db/client.js";
+import { CategoryInput } from "../validation/categoryValidation.js";
+import { slugGenerator } from "../utils/slugGenerater.js";
 
 class CategoryService {
   async getAllCategories() {

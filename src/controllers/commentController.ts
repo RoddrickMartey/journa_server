@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
-import { commentService } from "../services/commentService";
-import { commentSchema } from "../validation/commentValidation";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { commentService } from "../services/commentService.js";
+import { commentSchema } from "../validation/commentValidation.js";
 
 class CommentController {
   createComment = asyncHandler(async (req: Request, res: Response) => {

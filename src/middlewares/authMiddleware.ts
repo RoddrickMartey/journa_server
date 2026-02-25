@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { jwtService } from "../utils/jwtService";
-import { AppError } from "../errors/appError";
+import { jwtService } from "../utils/jwtService.js";
+import { AppError } from "../errors/appError.js";
 
 export const authUserMiddleware = (
   req: Request,

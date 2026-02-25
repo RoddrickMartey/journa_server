@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError } from "../errors/appError";
+import { AppError } from "../errors/appError.js";
 
 export const restrictGuest = (
   req: Request,

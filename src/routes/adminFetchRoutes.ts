@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { adminFetchController } from "../controllers/adminFetchController";
-import { authAdminMiddleware } from "../middlewares/authMiddleware";
+import { adminFetchController } from "../controllers/adminFetchController.js";
+import { authAdminMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 

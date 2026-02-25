@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import {
   createPostSchema,
   editorContentSchema,
   postImageUploadSchema,
   updatePostSchema,
-} from "../validation/postValidation";
-import { postService } from "../services/postService";
+} from "../validation/postValidation.js";
+import { postService } from "../services/postService.js";
 
 class PostController {
   createPost = asyncHandler(async (req: Request, res: Response) => {

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
-import { authService } from "../services/authService";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { authService } from "../services/authService.js";
 import {
   adminLoginSchema,
   adminCreateSchema,
@@ -11,7 +11,7 @@ import {
   adminUpdateAvatarSchema,
   adminUpdateProfileSchema,
   adminChangePasswordSchema,
-} from "../validation/adminValidation";
+} from "../validation/adminValidation.js";
 import "dotenv/config";
 
 class AdminController {

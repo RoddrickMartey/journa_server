@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
-import { categoryService } from "../services/categoryService";
-import { categorySchema } from "../validation/categoryValidation";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { categoryService } from "../services/categoryService.js";
+import { categorySchema } from "../validation/categoryValidation.js";
 
 class CategoryController {
   getAllCategories = asyncHandler(async (req: Request, res: Response) => {

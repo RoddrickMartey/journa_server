@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
-import { adminSuspensionService } from "../services/adminSuspensionService";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { adminSuspensionService } from "../services/adminSuspensionService.js";
 
 class AdminSuspensionController {
   suspendUser = asyncHandler(async (req: Request, res: Response) => {

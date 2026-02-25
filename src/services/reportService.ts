@@ -1,6 +1,6 @@
-import { prisma } from "../db/client";
-import { AppError } from "../errors/appError";
-import { ReportReason } from "../generated/prisma/client"; // Removed /browser for backend compatibility
+import { prisma } from "../db/client.js";
+import { AppError } from "../errors/appError.js";
+import { ReportReason } from "../generated/prisma/client.js"; // Removed /browser for backend compatibility
 
 class ReportService {
   /**

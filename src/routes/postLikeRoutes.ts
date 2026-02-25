@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authUserMiddleware } from "../middlewares/authMiddleware";
-import { postLikeController } from "../controllers/postLikeController";
+import { authUserMiddleware } from "../middlewares/authMiddleware.js";
+import { postLikeController } from "../controllers/postLikeController.js";
 import { likeSubscribeLimiter } from "../middlewares/rateLimiter.js";
 
 const router = Router();

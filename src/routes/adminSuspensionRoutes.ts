@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { adminSuspensionController } from "../controllers/adminSuspensionController";
-import { authAdminMiddleware } from "../middlewares/authMiddleware";
+import { adminSuspensionController } from "../controllers/adminSuspensionController.js";
+import { authAdminMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 

@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { reportController } from "../controllers/reportController";
+import { reportController } from "../controllers/reportController.js";
 import {
   authUserMiddleware,
   authAdminMiddleware,
-} from "../middlewares/authMiddleware";
+} from "../middlewares/authMiddleware.js";
 import { reportLimiter, readLimiter } from "../middlewares/rateLimiter.js";
 
 const router = Router();

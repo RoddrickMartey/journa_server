@@ -1,5 +1,5 @@
 import { hash, compare } from "bcrypt";
-import { AppError } from "../errors/appError";
+import { AppError } from "../errors/appError.js";
 
 /**
  * Payload required to hash a plain-text password.

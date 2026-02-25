@@ -1,7 +1,7 @@
-import { prisma } from "../db/client";
-import { passwordService } from "../utils/passwordService";
-import { jwtService } from "../utils/jwtService";
-import { AppError } from "../errors/appError";
+import { prisma } from "../db/client.js";
+import { passwordService } from "../utils/passwordService.js";
+import { jwtService } from "../utils/jwtService.js";
+import { AppError } from "../errors/appError.js";
 import {
   AdminLoginType,
   AdminCreateType,
@@ -12,8 +12,8 @@ import {
   AdminUpdateAvatarType,
   AdminUpdateProfileType,
   AdminChangePasswordType,
-} from "../validation/adminValidation";
-import { cloudinaryService } from "../utils/cloudinaryService";
+} from "../validation/adminValidation.js";
+import { cloudinaryService } from "../utils/cloudinaryService.js";
 
 class AuthService {
   /**

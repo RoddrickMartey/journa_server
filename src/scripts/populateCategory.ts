@@ -1,5 +1,5 @@
-import { prisma } from "../db/client";
-import { slugGenerator } from "../utils/slugGenerater";
+import { prisma } from "../db/client.js";
+import { slugGenerator } from "../utils/slugGenerater.js";
 
 const categories = [
   {

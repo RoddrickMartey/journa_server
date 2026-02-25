@@ -1,6 +1,6 @@
-import { categoryController } from "../controllers/categoryController";
+import { categoryController } from "../controllers/categoryController.js";
 import { Router } from "express";
-import { authAdminMiddleware } from "../middlewares/authMiddleware";
+import { authAdminMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 

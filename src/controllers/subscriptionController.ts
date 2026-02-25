@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
-import { subscriptionService } from "../services/subscriptionService";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { subscriptionService } from "../services/subscriptionService.js";
 
 class SubscriptionController {
   toggleSubscription = asyncHandler(async (req: Request, res: Response) => {

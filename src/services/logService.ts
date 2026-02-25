@@ -1,6 +1,6 @@
-import { prisma } from "../db/client";
-import { AppError } from "../errors/appError";
-import { LogCreateType, LogUpdateType } from "../validation/logValidation";
+import { prisma } from "../db/client.js";
+import { AppError } from "../errors/appError.js";
+import { LogCreateType, LogUpdateType } from "../validation/logValidation.js";
 
 class LogService {
   /**

@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { userController } from "../controllers/userController";
-import { authUserMiddleware } from "../middlewares/authMiddleware";
+import { userController } from "../controllers/userController.js";
+import { authUserMiddleware } from "../middlewares/authMiddleware.js";
 import {
   authLimiter,
   createUpdateLimiter,

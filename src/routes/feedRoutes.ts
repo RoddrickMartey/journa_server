@@ -1,6 +1,6 @@
-import { feedController } from "../controllers/feedController";
+import { feedController } from "../controllers/feedController.js";
 import { Router } from "express";
-import { authUserMiddleware } from "../middlewares/authMiddleware";
+import { authUserMiddleware } from "../middlewares/authMiddleware.js";
 import { feedLimiter } from "../middlewares/rateLimiter.js";
 
 const router = Router();

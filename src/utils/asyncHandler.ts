@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { handlePrismaError } from "../errors/prismaHandler";
+import { handlePrismaError } from "../errors/prismaHandler.js";
+import { handleZodError } from "../errors/zodHandler.js";
 import { ZodError } from "zod";
-import { handleZodError } from "../errors/zodHandler";
 
 /**
  * Wraps an asynchronous Express route handler and ensures that

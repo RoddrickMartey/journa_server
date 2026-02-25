@@ -1,6 +1,6 @@
-import { prisma } from "../db/client";
-import { asyncHandler } from "../utils/asyncHandler";
-import { AppError } from "../errors/appError";
+import { prisma } from "../db/client.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { AppError } from "../errors/appError.js";
 import { Request, Response } from "express";
 
 const postSelection = {

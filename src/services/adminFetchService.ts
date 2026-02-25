@@ -1,5 +1,9 @@
-import { prisma } from "../db/client";
-import { Prisma, ReportReason, ReportStatus } from "../generated/prisma/client";
+import { prisma } from "../db/client.js";
+import {
+  Prisma,
+  ReportReason,
+  ReportStatus,
+} from "../generated/prisma/client.js";
 
 class AdminFetchService {
   async getUsers(page = 1, limit = 20, q?: string) {

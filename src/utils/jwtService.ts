@@ -1,6 +1,6 @@
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import { Request } from "express";
-import { AppError } from "../errors/appError";
+import { AppError } from "../errors/appError.js";
 import "dotenv/config";
 
 /**

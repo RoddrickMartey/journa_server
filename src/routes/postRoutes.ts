@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { postController } from "../controllers/postController";
-import { authUserMiddleware } from "../middlewares/authMiddleware";
+import { postController } from "../controllers/postController.js";
+import { authUserMiddleware } from "../middlewares/authMiddleware.js";
 import {
   postCreationLimiter,
   uploadLimiter,

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
-import { blockService } from "../services/blockService";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { blockService } from "../services/blockService.js";
 
 class BlockController {
   toggleBlock = asyncHandler(async (req: Request, res: Response) => {

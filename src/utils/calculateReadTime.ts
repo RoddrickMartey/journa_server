@@ -1,4 +1,4 @@
-import { EditorContentType } from "../validation/postValidation";
+import { EditorContentType } from "../validation/postValidation.js";
 
 export const calculateReadTime = (content: EditorContentType): number => {
   const WORDS_PER_MINUTE = 225;

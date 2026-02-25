@@ -1,5 +1,5 @@
-import { prisma } from "../db/client";
-import { AppError } from "../errors/appError";
+import { prisma } from "../db/client.js";
+import { AppError } from "../errors/appError.js";
 
 class CommentService {
   async createComment(content: string, userId: string, postId: string) {

@@ -1,10 +1,10 @@
-import { prisma } from "../db/client";
-import { AppError } from "../errors/appError";
-import { Prisma } from "../generated/prisma/client";
-import { calculateReadTime } from "../utils/calculateReadTime";
-import { cloudinaryService } from "../utils/cloudinaryService";
-import { slugGenerator } from "../utils/slugGenerater";
-import { CreatePost, EditorContentType } from "../validation/postValidation";
+import { prisma } from "../db/client.js";
+import { AppError } from "../errors/appError.js";
+import { Prisma } from "../generated/prisma/client.js";
+import { calculateReadTime } from "../utils/calculateReadTime.js";
+import { cloudinaryService } from "../utils/cloudinaryService.js";
+import { slugGenerator } from "../utils/slugGenerater.js";
+import { CreatePost, EditorContentType } from "../validation/postValidation.js";
 
 class PostService {
   async createPast(payload: CreatePost, userId: string) {

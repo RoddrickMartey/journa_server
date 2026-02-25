@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import "dotenv/config";
-import { AppError } from "../errors/appError";
+import { AppError } from "../errors/appError.js";
 
 if (
   !process.env.CLOUDINARY_CLOUD_NAME ||

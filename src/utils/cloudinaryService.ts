@@ -1,5 +1,5 @@
-import { cloudinary } from "../config/cloudinary";
-import { AppError } from "../errors/appError";
+import { cloudinary } from "../config/cloudinary.js";
+import { AppError } from "../errors/appError.js";
 
 /**
  * Payload for uploading a Base64 file

@@ -1,5 +1,5 @@
-import { prisma } from "../db/client";
-import { AppError } from "../errors/appError";
+import { prisma } from "../db/client.js";
+import { AppError } from "../errors/appError.js";
 
 class PostLikeService {
   async toggleLike(userId: string, postId: string) {

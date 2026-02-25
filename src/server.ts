@@ -5,8 +5,9 @@ import cookieParser from "cookie-parser";
 import "dotenv/config";
 
 // Import Prisma to keep the DB awake
+import { prisma } from "./db/client.js";
 
-import { globalErrorHandler } from "./middlewares/glodalErrorHandler.js";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler.js";
 import { globalLimiter } from "./middlewares/rateLimiter.js";
 import userRouter from "./routes/userRouters.js";
 import adminRouter from "./routes/adminRoutes.js";
@@ -51,7 +52,7 @@ app.use(morgan("dev"));
 app.get("/health", async (req: Request, res: Response) => {
   try {
     // 1. Keep DB awake: Executes a tiny query to prevent pause
-    // await prisma.$queryRaw`SELECT 1`;
+    await prisma.$queryRaw`SELECT 1`;
     res.json({
       status: "ok",
       message: "Journa API is running",

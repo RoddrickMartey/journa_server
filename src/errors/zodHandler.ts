@@ -1,5 +1,5 @@
 import { ZodError } from "zod";
-import { AppError } from "./appError";
+import { AppError } from "./appError.js";
 
 /**
  * Converts Zod validation errors into a standardized AppError

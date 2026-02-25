@@ -1,5 +1,5 @@
-import { prisma } from "../db/client";
-import { AppError } from "../errors/appError";
+import { prisma } from "../db/client.js";
+import { AppError } from "../errors/appError.js";
 
 class SubscriptionService {
   async toggleSubscription(subscriberId: string, subscribedId: string) {

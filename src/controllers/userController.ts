@@ -1,6 +1,6 @@
-import { userService } from "../services/userServices";
+import { userService } from "../services/userServices.js";
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import {
   userLoginSchema,
   userSignupSchema,
@@ -14,10 +14,10 @@ import {
   userUpdateSocialsSchema,
   userChangePasswordSchema,
   updateSettingsSchema,
-} from "../validation/userValidation";
+} from "../validation/userValidation.js";
 import "dotenv/config";
-import { countries } from "../data/countries";
-import { AppError } from "../errors/appError";
+import { countries } from "../data/countries.js";
+import { AppError } from "../errors/appError.js";
 
 class UserController {
   readonly secured = process.env.NODE_ENV === "production";

@@ -1,5 +1,5 @@
-import { Prisma } from "../generated/prisma/client";
-import { AppError } from "./appError";
+import { Prisma } from "../generated/prisma/client.js";
+import { AppError } from "./appError.js";
 
 /**
  * Extracts field names from Prisma error messages like:

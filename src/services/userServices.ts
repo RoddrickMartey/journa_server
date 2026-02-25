@@ -1,15 +1,15 @@
-import { prisma } from "../db/client";
-import { passwordService } from "../utils/passwordService";
-import { jwtService } from "../utils/jwtService";
-import { AppError } from "../errors/appError";
+import { prisma } from "../db/client.js";
+import { passwordService } from "../utils/passwordService.js";
+import { jwtService } from "../utils/jwtService.js";
+import { AppError } from "../errors/appError.js";
 import {
   UpdateSettingsType,
   UserLoginType,
   UserSignupType,
   UserUpdateEmailType,
   UserUpdateUsernameType,
-} from "../validation/userValidation";
-import { cloudinaryService } from "../utils/cloudinaryService";
+} from "../validation/userValidation.js";
+import { cloudinaryService } from "../utils/cloudinaryService.js";
 
 class UserService {
   async signup(payload: UserSignupType) {

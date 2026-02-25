@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
-import { adminFetchService } from "../services/adminFetchService";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { adminFetchService } from "../services/adminFetchService.js";
 
 class AdminFetchController {
   // Helper to parse numbers safely

@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authUserMiddleware } from "../middlewares/authMiddleware";
-import { commentController } from "../controllers/commentController";
+import { authUserMiddleware } from "../middlewares/authMiddleware.js";
+import { commentController } from "../controllers/commentController.js";
 import {
   commentCreationLimiter,
   createUpdateLimiter,

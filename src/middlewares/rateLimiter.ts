@@ -1,6 +1,6 @@
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import { RateLimitRequestHandler } from "express-rate-limit";
-import { AppError } from "../errors/appError"; // Adjust path as needed
+import { AppError } from "../errors/appError.js"; // Adjust path as needed
 import { NextFunction, Request, Response } from "express";
 
 const userOrIpKeyGenerator = (req: any) => {
@@ -19,7 +19,7 @@ export const limitReachedHandler = (
   req: Request,
   _res: Response,
   next: NextFunction,
-  options: RateLimitHandlerOptions
+  options: RateLimitHandlerOptions,
 ) => {
   const message =
     options?.message ?? "Too many requests. Please try again later.";

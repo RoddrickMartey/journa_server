@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
-import { logService } from "../services/logService";
-import { LogCreateType, logUpdateSchema } from "../validation/logValidation";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { logService } from "../services/logService.js";
+import { LogCreateType, logUpdateSchema } from "../validation/logValidation.js";
 
 class LogController {
   /**

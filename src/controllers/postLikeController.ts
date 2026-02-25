@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler";
-import { postLikeService } from "../services/postLikeService";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { postLikeService } from "../services/postLikeService.js";
 
 class PostLikeController {
   toggleLike = asyncHandler(async (req: Request, res: Response) => {
